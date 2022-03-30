@@ -10,10 +10,54 @@ router.get("/", (req, res) => {
     if (err) {
       res.status(500).json({ error: "There was a server side error" });
     } else {
-      res.status(200).json({ count:data.length,message: "Success", result: data });
+      res
+        .status(200)
+        .json({ count: data.length, message: "Success", result: data });
     }
   });
 });
+
+// get active todo using mongodb custom instance methods
+router.get("/active", async (req, res) => {
+  // to use custom instance, need to first create object from model like following line
+  const todo = new Todo();
+  try {
+    const data = await todo.findActive();
+    res.status(200).json({ data: data });
+  } catch (err) {
+    res.status(500).json({ error: "There was a server side error" });
+  }
+});
+
+// get active todo using mongodb custom instance methods
+router.get("/active-using-callback", (req, res) => {
+  // to use custom instance, need to first create object from model like following line
+  const todo = new Todo();
+  todo.findActiveCallback((err, data) => {
+    res.status(200).json({ data });
+  });
+});
+
+// find todos containing 'js' in
+router.get("/js", async (req, res) => {
+  try {
+    const data = await Todo.findByJS();
+    res.status(200).json({ data: data });
+  } catch (err) {
+    res.status(500).json({ error: "There was a server side error" });
+  }
+});
+
+
+// find todos by language
+router.get("/language/:lang", async (req, res) => {
+    try {
+      const data = await Todo.find().byLanguage(req.params.lang);
+      res.status(200).json({ data: data });
+    } catch (err) {
+      res.status(500).json({ error: "There was a server side error" });
+    }
+  });
 
 // get a todo
 router.get("/:id", (req, res) => {
